@@ -27,3 +27,9 @@ export const FULL_METADATA_ACCEPT = "application/json;odata=fullmetadata";
 
 export const RETURN_NO_CONTENT = "return-no-content";
 export const RETURN_CONTENT = "return-content";
+
+export const EMULATOR_ACCOUNT_NAME = "devstoreaccount1";
+export const EMULATOR_ACCOUNT_KEY = Buffer.from(
+  "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==",
+  "base64"
+);
