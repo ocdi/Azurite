@@ -4,8 +4,6 @@ import StorageErrorFactory from "../errors/StorageErrorFactory";
 import Operation from "../generated/artifacts/operation";
 import Context from "../generated/Context";
 import IRequest from "../generated/IRequest";
-import ITableMetadataStore from "../persistence/ITableMetadataStore";
-import { AccountSASPermission } from "./AccountSASPermissions";
 import {
   generateAccountSASSignature,
   IAccountSASSignatureValues
@@ -16,7 +14,6 @@ import OPERATION_ACCOUNT_SAS_PERMISSIONS from "./OperationAccountSASPermission";
 export default class AccountSASAuthenticator implements IAuthenticator {
   public constructor(
     private readonly accountDataStore: IAccountDataStore,
-    private readonly blobMetadataStore: ITableMetadataStore,
     private readonly logger: ILogger
   ) {}
 

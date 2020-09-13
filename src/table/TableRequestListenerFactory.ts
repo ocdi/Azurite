@@ -17,6 +17,11 @@ import ITableMetadataStore from "./persistence/ITableMetadataStore";
 import { DEFAULT_TABLE_CONTEXT_PATH } from "./utils/constants";
 
 import morgan = require("morgan");
+import IAccountDataStore from "../common/IAccountDataStore";
+import AccountSASAuthenticator from "./authentication/AccountSASAuthenticator";
+import IAuthenticator from "./authentication/IAuthenticator";
+import TableSASAuthenticator from "./authentication/TableSASAuthenticator";
+import AuthenticationMiddlewareFactory from "./middleware/AuthenticationMiddlewareFactory";
 /**
  * Default RequestListenerFactory based on express framework.
  *
@@ -31,6 +36,7 @@ export default class TableRequestListenerFactory
   implements IRequestListenerFactory {
   public constructor(
     private readonly metadataStore: ITableMetadataStore,
+    private readonly accountDataStore: IAccountDataStore,
     private readonly enableAccessLog: boolean,
     private readonly accessLogWriteStream?: NodeJS.WritableStream // private readonly skipApiVersionCheck?: boolean,
   ) {}
@@ -98,6 +104,30 @@ export default class TableRequestListenerFactory
 
     // Dispatch incoming HTTP request to specific operation
     app.use(middlewareFactory.createDispatchMiddleware());
+
+    // AuthN middleware, like shared key auth or SAS auth
+    const authenticationMiddlewareFactory = new AuthenticationMiddlewareFactory(
+      logger
+    );
+    const authenticators: IAuthenticator[] = [
+      // new PublicAccessAuthenticator(this.metadataStore, logger),
+      // new BlobSharedKeyAuthenticator(this.accountDataStore, logger),
+      new AccountSASAuthenticator(
+        this.accountDataStore,
+        this.metadataStore,
+        logger
+      ),
+      new TableSASAuthenticator(
+        this.accountDataStore,
+        this.metadataStore,
+        logger
+      )
+    ];
+    app.use(
+      authenticationMiddlewareFactory.createAuthenticationMiddleware(
+        authenticators
+      )
+    );
 
     // Generated, will do basic validation defined in swagger
     app.use(middlewareFactory.createDeserializerMiddleware());
